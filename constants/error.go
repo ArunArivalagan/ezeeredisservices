@@ -8,6 +8,7 @@ const (
 	InvalidKey                ErrorCode = 101
 	UnableToProvideData       ErrorCode = 102
 	UpdateFailed              ErrorCode = 103
+	InvalidRequest            ErrorCode = 104
 )
 
 type ErrorCode int
@@ -23,4 +24,5 @@ var errorMessages = map[ErrorCode]string{
 	InvalidKey:                "Invalid cache key",
 	UnableToProvideData:       "Unable to provide data",
 	UpdateFailed:              "Update failed",
+	InvalidRequest:            "Invalid Request",
 }

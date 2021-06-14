@@ -2,7 +2,9 @@ package redisclient
 
 import (
 	"fmt"
+	"strconv"
 
+	entity "github.com/ezeeredisservices/io"
 	"github.com/ezeeredisservices/logger"
 	"github.com/go-redis/redis"
 )
@@ -101,6 +103,48 @@ func PutLocation(key string, data []byte) error {
 		err = client.Set(key, data, 0).Err()
 	}
 	return err
+}
+
+func GeoAdd(key string, data []entity.Address) error {
+	var err error
+	client, err := GetClient()
+	if err == nil {
+		for _, address := range data {
+			lat, _ := strconv.ParseFloat(address.Latitude, 64)
+			lon, _ := strconv.ParseFloat(address.Longitude, 64)
+			client.GeoAdd(key, &redis.GeoLocation{Name: address.Code, Latitude: lat, Longitude: lon})
+		}
+	}
+	return err
+}
+
+func GeoNearestLocations(key string, lat, lon float64, radius float64, count int) ([]entity.Address, error) {
+	var err error
+	var locationAddress []entity.Address
+	client, err := GetClient()
+	if err == nil {
+		locations, _ := client.GeoRadius(key, lon, lat, &redis.GeoRadiusQuery{
+			Radius:      radius,
+			Unit:        "km",
+			WithGeoHash: true,
+			WithCoord:   true,
+			WithDist:    true,
+			Count:       count,
+			Sort:        "ASC",
+		}).Result()
+
+		fmt.Println(locations)
+
+		for _, geolocation := range locations {
+			var address entity.Address
+			address.Code = geolocation.Name
+			address.Latitude = strconv.FormatFloat(geolocation.Latitude, 'f', -1, 64)
+			address.Longitude = strconv.FormatFloat(geolocation.Longitude, 'f', -1, 64)
+			address.Distance = strconv.FormatFloat(geolocation.Dist, 'f', -1, 64)
+			locationAddress = append(locationAddress, address)
+		}
+	}
+	return locationAddress, err
 }
 
 func GetLocations(key string) (string, error) {

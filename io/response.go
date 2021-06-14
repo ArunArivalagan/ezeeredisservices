@@ -1,27 +1,22 @@
 package io
 
 import (
-	"encoding/json"
 	"time"
 )
 
 type Response struct {
-	Status    int    `json:"status"`
-	ErrorCode int    `json:"errorCode"`
-	ErrorDesc string `json:"errorDesc"`
-	Datetime  string `json:"datetime"`
-	Data      string `json:"data"`
+	Status    int         `json:"status"`
+	ErrorCode int         `json:"errorCode"`
+	ErrorDesc string      `json:"errorDesc"`
+	Datetime  string      `json:"datetime"`
+	Data      interface{} `json:"data"`
 }
 
-func Success(dataStruct interface{}) Response {
+func Success(data interface{}) Response {
 	var response Response
-	var data []byte
 	response.Status = 1
 	response.Datetime = time.Now().Format("2006-01-02 15:04:05")
-	if dataStruct != nil {
-		data, _ = json.Marshal(dataStruct)
-	}
-	response.Data = string(data)
+	response.Data = data
 	return response
 }
 

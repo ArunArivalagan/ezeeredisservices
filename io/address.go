@@ -8,6 +8,7 @@ type Address struct {
 	Code      string `json:"code"`
 	Latitude  string `json:"latitude"`
 	Longitude string `json:"longitude"`
+	Distance  string `json:"distance"`
 }
 
 func (address Address) IsValid() bool {
